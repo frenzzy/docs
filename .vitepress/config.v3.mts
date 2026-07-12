@@ -62,6 +62,7 @@ export const v3: DefaultTheme.Config = {
           { text: 'Trailing Slash Redirect', link: '/v3/features/trailing-slash-redirect' },
           { text: 'Include Hidden Files', link: '/v3/features/include-hidden' },
           { text: 'Follow Symlinks', link: '/v3/features/follow-symlinks' },
+          { text: 'Use Relative Root', link: '/v3/features/use-relative-root' },
           { text: 'Health endpoint', link: '/v3/features/health-endpoint' },
           { text: 'Metrics', link: '/v3/features/metrics' },
           { text: 'Virtual Hosting', link: '/v3/features/virtual-hosting' },

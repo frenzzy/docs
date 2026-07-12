@@ -114,6 +114,8 @@ Options:
           Include hidden files/directories (dotfiles), allowing them to be served and listed in auto HTML index pages (directory listing). Disabled by default; hidden files return `404 Not Found` [env: SERVER_INCLUDE_HIDDEN=] [default: false] [possible values: true, false]
       --follow-symlinks [<FOLLOW_SYMLINKS>]
           Follow symbolic links when serving files or directories. Disabled by default; requests whose path contains any symlink component return `403 Forbidden` [env: SERVER_FOLLOW_SYMLINKS=] [default: false] [possible values: true, false]
+      --use-relative-root [<USE_RELATIVE_ROOT>]
+          Resolve the web root directory at request time rather than at startup, allowing symlinked root directories to be swapped at runtime [env: SERVER_USE_RELATIVE_ROOT=] [default: false] [possible values: true, false]
       --accept-markdown [<ACCEPT_MARKDOWN>]
           Enable markdown content negotiation. When a client sends Accept: text/markdown, serve .md or .html.md files if available [env: SERVER_ACCEPT_MARKDOWN=] [default: false] [possible values: true, false]
       --text-charset [<TEXT_CHARSET>]

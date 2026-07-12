@@ -92,6 +92,9 @@ trusted-proxies = []
 #### Redirect to trailing slash in the requested directory uri
 redirect-trailing-slash = true
 
+#### Use relative root (skip root canonicalization at startup)
+use-relative-root = false
+
 #### Check for existing pre-compressed files
 compression-static = true
 

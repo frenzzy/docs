@@ -199,6 +199,10 @@ Include hidden files/directories (dotfiles), allowing them to be served and list
 
 Follow symbolic links when serving files or directories. Disabled by default; requests whose path contains any symlink component return `403 Forbidden`.
 
+## SERVER_USE_RELATIVE_ROOT
+
+When enabled, the root directory canonicalization at startup is skipped. This allows symlinked root directories to be resolved at request time rather than at startup, making it possible to swap symlink targets at runtime without restarting the server. See [Use Relative Root](../features/use-relative-root) for details and security considerations. Default `false`.
+
 ## SERVER_ACCEPT_MARKDOWN
 
 Enable markdown content negotiation. When a client sends `Accept: text/markdown`, serve `.md` or `.html.md` files if available. See [Markdown Content Negotiation](../features/markdown-content-negotiation.md) for details. Default `false`.
