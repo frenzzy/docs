@@ -62,6 +62,7 @@ export const v2: DefaultTheme.Config = {
           { text: 'Trailing Slash Redirect', link: '/v2/features/trailing-slash-redirect' },
           { text: 'Ignore Files', link: '/v2/features/ignore-files' },
           { text: 'Disable Symlinks', link: '/v2/features/disable-symlinks' },
+          { text: 'Use Relative Root', link: '/v2/features/use-relative-root' },
           { text: 'Health endpoint', link: '/v2/features/health-endpoint' },
           { text: 'Metrics', link: '/v2/features/metrics' },
           { text: 'Virtual Hosting', link: '/v2/features/virtual-hosting' },

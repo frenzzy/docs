@@ -100,6 +100,8 @@ Options:
           Ignore hidden files/directories (dotfiles), preventing them to be served and being included in auto HTML index pages (directory listing) [env: SERVER_IGNORE_HIDDEN_FILES=] [default: true] [possible values: true, false]
       --disable-symlinks [<DISABLE_SYMLINKS>]
           Prevent following files or directories if any path name component is a symbolic link [env: SERVER_DISABLE_SYMLINKS=] [default: true] [possible values: true, false]
+      --use-relative-root [<USE_RELATIVE_ROOT>]
+          Resolve the web root directory at request time rather than at startup, allowing symlinked root directories to be swapped at runtime [env: SERVER_USE_RELATIVE_ROOT=] [default: false] [possible values: true, false]
       --accept-markdown [<ACCEPT_MARKDOWN>]
           Enable markdown content negotiation. When a client sends Accept: text/markdown, serve .md or .html.md files if available [env: SERVER_ACCEPT_MARKDOWN=] [default: false] [possible values: true, false]
       --text-charset [<TEXT_CHARSET>]

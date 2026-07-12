@@ -169,6 +169,10 @@ Ignore hidden files/directories (dotfiles), preventing them from being served an
 
 Prevent following files or directories if any path name component is a symbolic link.
 
+## SERVER_USE_RELATIVE_ROOT
+
+When enabled, the root directory canonicalization at startup is skipped. This allows symlinked root directories to be resolved at request time rather than at startup, making it possible to swap symlink targets at runtime without restarting the server. See [Use Relative Root](../features/use-relative-root.md) for details and security considerations. Default `false`.
+
 ## SERVER_HEALTH
 
 Activate the health endpoint.
