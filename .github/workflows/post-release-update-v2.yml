@@ -44,6 +44,7 @@ jobs:
         env:
           UPLOAD_CHECKSUM: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SWS_TOKEN: ${{ secrets.SWS_TOKEN }}
         run: |
           scripts/post_release_updates.sh
 

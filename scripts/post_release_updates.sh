@@ -49,7 +49,7 @@ if [[ -n "$upload_checksum" ]] && [[ "$upload_checksum" = "true" ]]; then
     release_id=$(cat $release_json | jq -r ".id")
     curl -LX POST \
         --data-binary @$checksum_file_name \
-        --header "Authorization: token $GITHUB_TOKEN" \
+        --header "Authorization: token $SWS_TOKEN" \
         --header "Content-Type: application/octet-stream" \
         https://uploads.github.com/repos/static-web-server/static-web-server/releases/$release_id/assets?name=$checksum_file_name
 fi

@@ -375,7 +375,7 @@ function fallbackCopy(text: string, onSuccess: () => void) {
 
           <div class="sws-install-line" role="group" aria-label="Quick install Docker">
             <pre
-              class="install-cmd sws-code"><span class="sws-t-cmd">docker</span> <span class="sws-t-dim">run -p</span> <span class="sws-t-num">8080</span>:<span class="sws-t-num">80</span> <span class="sws-t-dim">-v</span> <span class="sws-t-key">$PWD</span><span class="sws-t-dim">:/public ghcr.io/static-web-server/static-web-server:3</span></pre>
+              class="install-cmd sws-code"><span class="sws-t-cmd">docker</span> <span class="sws-t-dim">run -p</span> <span class="sws-t-num">8080</span>:<span class="sws-t-num">80</span> <span class="sws-t-dim">-v</span> <span class="sws-t-key">$PWD</span><span class="sws-t-dim">:/public ghcr.io/static-web-server/static-web-server:2</span></pre>
             <button class="sws-copy-btn" type="button" aria-label="Copy Docker command" @click="handleCopy">
               <svg class="sws-i-copy" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
                 <rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" />
