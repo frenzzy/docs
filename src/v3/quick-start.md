@@ -9,7 +9,7 @@ static-web-server --port 8787 --root ./my-public-dir
 Or if you use [Docker](https://www.docker.com/) just try
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1 -g info
 ```
 
 > [!INFO] Docker Tip

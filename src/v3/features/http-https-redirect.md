@@ -49,7 +49,7 @@ static-web-server -p 4433 -d public/ -g trace \
     # HTTPS redirect options
     --https-redirect=true \
     --https-redirect-host="localhost" \
-    --https-redirect-from-port=80 \
+    --https-redirect-from-port=8787 \
     --https-redirect-from-hosts="localhost"
     # or using multiple hostnames/IPs:
     # --https-redirect-from-hosts = "localhost,127.0.0.1"
@@ -61,11 +61,11 @@ After running the server, the logs should look as follows.
 .......
 2023-06-01T22:30:17.555338Z  INFO static_web_server::server: http to https redirect: enabled=true
 2023-06-01T22:30:17.555349Z  INFO static_web_server::server: http to https redirect host: localhost
-2023-06-01T22:30:17.555359Z  INFO static_web_server::server: http to https redirect from port: 80
+2023-06-01T22:30:17.555359Z  INFO static_web_server::server: http to https redirect from port: 8787
 2023-06-01T22:30:17.555368Z  INFO static_web_server::server: http to https redirect from hosts: localhost
 2023-06-01T22:30:17.557507Z  INFO Server::start_server{addr_str="[::]:4433" threads=8}: static_web_server::server: close time.busy=0.00ns time.idle=3.00µs
 2023-06-01T22:30:17.557547Z  INFO static_web_server::server: http2 server is listening on https://[::]:4433
-2023-06-01T22:30:17.557583Z  INFO Server::start_server{addr=[::]:80 threads=8}: static_web_server::server: close time.busy=0.00ns time.idle=1.92µs
-2023-06-01T22:30:17.557596Z  INFO static_web_server::server: http1 redirect server is listening on http://[::]:80
+2023-06-01T22:30:17.557583Z  INFO Server::start_server{addr=[::]:8787 threads=8}: static_web_server::server: close time.busy=0.00ns time.idle=1.92µs
+2023-06-01T22:30:17.557596Z  INFO static_web_server::server: http1 redirect server is listening on http://[::]:8787
 2023-06-01T22:30:17.557768Z  INFO static_web_server::server: press ctrl+c to shut down the servers
 ```

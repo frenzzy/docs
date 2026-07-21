@@ -63,25 +63,25 @@ To run SWS, there are several Docker image variants that you can use.
 ### Scratch (just the binary)
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2 -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1 -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2 -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1 -g info
 ```
 
 ### Alpine
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2-alpine -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1-alpine -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2-alpine -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-alpine -g info
 ```
 
 ### Debian
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2-debian -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1-debian -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2-debian -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-debian -g info
 ```
 
 ## FIPS-validated TLS
@@ -96,7 +96,7 @@ Platforms supported by FIPS images are `linux/amd64` and `linux/arm64` only.
 To verify that the image supports FIPS mode, check the output of the following command:
 
 ```sh{3}
-docker run --rm ghcr.io/static-web-server/static-web-server:2-fips -V | grep -i "fips"
+docker run --rm ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-fips -V | grep -i "fips"
 # FIPS Mode:
 #   Module Version:   AWS-LC-FIPS 3.0.x
 #   Crypto Provider:  aws-lc-rs (via aws-lc-fips-sys)
@@ -106,25 +106,25 @@ docker run --rm ghcr.io/static-web-server/static-web-server:2-fips -V | grep -i 
 
 ```sh
 # Scratch (just the binary)
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2-fips -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1-fips -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2-fips -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-fips -g info
 ```
 
 ### Alpine {#fips-alpine}
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2-fips-alpine -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1-fips-alpine -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2-fips-alpine -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-fips-alpine -g info
 ```
 
 ### Debian {#fips-debian}
 
 ```sh
-docker run --rm -it -p 8787:80 joseluisq/static-web-server:2-fips-debian -g info
+docker run --rm -it -p 8787:8787 joseluisq/static-web-server:3.0.0-beta.1-fips-debian -g info
 # or
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:2-fips-debian -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-fips-debian -g info
 ```
 
 ### Development
@@ -133,9 +133,9 @@ Additionally, we publish **development** Docker images based on `master` branch 
 
 ```sh
 # Scratch (just the binary)
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:devel -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:devel -g info
 # Debian
-docker run --rm -it -p 8787:80 ghcr.io/static-web-server/static-web-server:devel-debian -g info
+docker run --rm -it -p 8787:8787 ghcr.io/static-web-server/static-web-server:devel-debian -g info
 ```
 
 ## Dockerfile
@@ -145,27 +145,27 @@ SWS Docker images can be extended as needed.
 Extending the **Scratch** Docker image (just the binary)
 
 ```Dockerfile
-FROM joseluisq/static-web-server:2
+FROM joseluisq/static-web-server:3.0.0-beta.1
 # or
-FROM ghcr.io/static-web-server/static-web-server:2
+FROM ghcr.io/static-web-server/static-web-server:3.0.0-beta.1
 # do stuff...
 ```
 
 Or the **Alpine**
 
 ```Dockerfile
-FROM joseluisq/static-web-server:2-alpine
+FROM joseluisq/static-web-server:3.0.0-beta.1-alpine
 # or
-FROM ghcr.io/static-web-server/static-web-server:2-alpine
+FROM ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-alpine
 # do stuff...
 ```
 
 Or the **Debian**
 
 ```Dockerfile
-FROM joseluisq/static-web-server:2-debian
+FROM joseluisq/static-web-server:3.0.0-beta.1-debian
 # or
-FROM ghcr.io/static-web-server/static-web-server:2-debian
+FROM ghcr.io/static-web-server/static-web-server:3.0.0-beta.1-debian
 # do stuff...
 ```
 
@@ -178,10 +178,10 @@ version: '3.3'
 
 services:
   website:
-    image: joseluisq/static-web-server:2-alpine
+  image: joseluisq/static-web-server:3.0.0-beta.1-alpine
     container_name: 'website'
     ports:
-      - 80:80
+      - 8787:8787
     restart: unless-stopped
     environment:
       # Note: those envs are customizable but also optional
@@ -220,7 +220,7 @@ services:
       - '/var/run/docker.sock:/var/run/docker.sock:ro'
 
   website:
-    image: joseluisq/static-web-server:2
+    image: joseluisq/static-web-server:3.0.0-beta.1
     environment:
       # Note: those envs are customizable but also optional
       - SERVER_ROOT=/public
@@ -228,13 +228,15 @@ services:
       - /var/www/website:/public
       # Or use an existing Docker volume
       # - website_data:/public
+    ports:
+      - '8787:8787'
     labels:
       - 'traefik.enable=true'
       - 'traefik.docker.network=traefik_net'
       - 'traefik.http.routers.website.entrypoints=web'
       - 'traefik.http.routers.website.rule=Host(`website.localhost`)'
       - 'traefik.http.routers.website.priority=1'
-      - 'traefik.http.services.website.loadbalancer.server.port=80'
+      - 'traefik.http.services.website.loadbalancer.server.port=8787'
     networks:
       - traefik_net
 
@@ -259,13 +261,13 @@ metadata:
 spec:
   containers:
     - name: sws
-      image: ghcr.io/static-web-server/static-web-server
+      image: ghcr.io/static-web-server/static-web-server:3.0.0-beta.1
       command:
         - static-web-server
         - --root=/public
         - --health
       ports:
-        - containerPort: 80
+        - containerPort: 8787
       livenessProbe:
         httpGet:
           path: /health
