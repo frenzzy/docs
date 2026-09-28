@@ -122,6 +122,9 @@ log-forwarded-for = false
 #### Proxy IPs to accept the X-Real-IP and X-Forwarded-For headers from. Empty means none
 trusted-proxies = []
 
+#### Log the W3C trace context of the `traceparent` header (JSON log format only)
+log-trace-context = false
+
 #### Redirect to trailing slash in the requested directory uri
 redirect-trailing-slash = true
 

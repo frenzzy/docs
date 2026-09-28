@@ -211,6 +211,10 @@ Log the first `X-Forwarded-For` address of requests from `SERVER_TRUSTED_PROXIES
 
 List of proxy IPs to use the `X-Real-IP` and `X-Forwarded-For` headers from. IPv4 entries also match their IPv4-mapped IPv6 form (`::ffff:a.b.c.d`). See [Trusted proxies](../features/logging.md#trusted-proxies). Default empty (trusts no one, so the headers are not logged).
 
+## SERVER_LOG_TRACE_CONTEXT
+
+Add the `trace_id`, `span_id` and `trace_flags` fields of a valid W3C `traceparent` request header to the log lines written for the request. Requires the `json` log format. See [Logging Trace Context](../features/logging.md#logging-trace-context). Default `false`.
+
 ## SERVER_REDIRECT_TRAILING_SLASH
 
 Check for a trailing slash in the requested directory URI and redirect permanently (308) to the same path with a trailing slash suffix if it is missing. Default `true` (enabled).

@@ -120,6 +120,8 @@ Options:
           Log the first X-Forwarded-For address of requests from --trusted-proxies [env: SERVER_LOG_FORWARDED_FOR=] [default: false] [possible values: true, false]
       --trusted-proxies <TRUSTED_PROXIES>
           List of proxy IPs to use the X-Real-IP and X-Forwarded-For headers from. The default trusts no one, so the headers are not logged unless set. IPv4 entries also match their IPv4-mapped IPv6 form (`::ffff:a.b.c.d`) [env: SERVER_TRUSTED_PROXIES=]
+      --log-trace-context [<LOG_TRACE_CONTEXT>]
+          Add the `trace_id`, `span_id` and `trace_flags` fields of a valid W3C `traceparent` request header to the log lines emitted by the request handler. Requires `--log-format json` [env: SERVER_LOG_TRACE_CONTEXT=] [default: false] [possible values: true, false]
       --redirect-trailing-slash [<REDIRECT_TRAILING_SLASH>]
           Check for a trailing slash in the requested directory URI and redirect permanently (308) to the same path with a trailing slash suffix if it is missing [env: SERVER_REDIRECT_TRAILING_SLASH=] [default: true] [possible values: true, false]
       --include-hidden [<INCLUDE_HIDDEN>]
