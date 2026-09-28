@@ -187,6 +187,10 @@ Log the `X-Forwarded-For` header for remote IP information. Default `false`.
 
 List of IPs to use `X-Forwarded-For` from. The default is to trust all. Default `""`.
 
+## SERVER_LOG_TRACE_CONTEXT
+
+Add the trace context of a valid W3C `traceparent` request header to the JSON log lines of the request handler. See [Logging Trace Context](../features/logging#logging-trace-context). Default `false`.
+
 ## SERVER_REDIRECT_TRAILING_SLASH
 
 Check for a trailing slash in the requested directory URI and redirect permanently (308) to the same path with a trailing slash suffix if it is missing. Default `true` (enabled).

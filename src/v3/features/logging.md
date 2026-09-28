@@ -103,7 +103,7 @@ When the level is `info` or lower, SWS logs each request with the `incoming requ
 }
 ```
 
-The `remote_addr`, `x_real_ip` and `real_remote_ip` fields are added when the corresponding logging options are enabled and a value is available. Fields without a value are omitted.
+The `remote_addr`, `x_real_ip` and `real_remote_ip` fields are added when the corresponding logging options are enabled and a value is available, and the `trace_id`, `span_id` and `trace_flags` fields when [trace context logging](#logging-trace-context) is enabled. Fields without a value are omitted.
 
 ## Log Remote Addresses
 
@@ -229,6 +229,36 @@ curl "http://[::1]:8080" --header "X-Forwarded-For: <iframe src=//malware.attack
   "target": "static_web_server::log_addr"
 }
 ```
+
+## Logging Trace Context
+
+When SWS runs behind a proxy or load balancer that starts or continues a [W3C Trace Context](https://www.w3.org/TR/trace-context/) trace, the proxy forwards a `traceparent` request header. SWS can add the trace context of that header to its log lines, so a log backend can link them to the trace and to the logs of other services.
+
+This feature is disabled by default. Enable it with the boolean `--log-trace-context` option, the equivalent [SERVER_LOG_TRACE_CONTEXT](./../configuration/env#server_log_trace_context) env or the `log-trace-context` key of the config file. It requires the `json` [log format](#log-format).
+
+When enabled and the request has a valid `traceparent` header, the log lines emitted by the request handler get three top-level fields, as recommended by the OpenTelemetry [Trace Context in Non-OTLP Log Formats](https://opentelemetry.io/docs/specs/otel/compatibility/logging_trace_context/) specification:
+
+- `trace_id`: the `trace-id` of the header (32 lowercase hex characters).
+- `span_id`: the `parent-id` of the header (16 lowercase hex characters), which is the span of the caller. SWS does not create spans of its own.
+- `trace_flags`: the `trace-flags` of the header (2 lowercase hex characters).
+
+```sh
+static-web-server -p 8787 -d ./public/ -g info --log-trace-context
+```
+
+```sh
+curl "http://localhost:8787/missing.css" \
+    --header "traceparent: 00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01"
+```
+
+```json
+{"timestamp":"2026-09-28T10:39:57.103529+02:00","level":"INFO","message":"incoming request","method":"GET","uri":"/missing.css","target":"static_web_server::log_addr","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
+{"timestamp":"2026-09-28T10:39:57.103712+02:00","level":"WARN","method":"GET","uri":"/missing.css","status":404,"error":"Not Found","target":"static_web_server::error_page","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
+```
+
+The fields are added at every log level, e.g. to the `404` warning when the level is `warn`.
+
+SWS only reads the header. It does not generate trace IDs, export spans or change the headers of the request or the response. Missing, invalid or repeated `traceparent` headers are ignored; see the specification's [versioning rules](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).
 
 ## File Logging
 

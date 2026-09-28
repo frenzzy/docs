@@ -89,6 +89,9 @@ log-forwarded-for = false
 #### IPs to accept the X-Forwarded-For header from. Empty means all
 trusted-proxies = []
 
+#### Log the W3C trace context of the `traceparent` header (JSON log format only)
+log-trace-context = false
+
 #### Redirect to trailing slash in the requested directory uri
 redirect-trailing-slash = true
 
