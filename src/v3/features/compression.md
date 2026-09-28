@@ -4,7 +4,7 @@ outline: deep
 
 # Compression
 
-**`SWS`** provides [`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952), [`Deflate`](https://datatracker.ietf.org/doc/html/rfc1951#section-Abstract), [`Brotli`](https://www.ietf.org/rfc/rfc7932.txt) and [`Zstandard` (zstd)](https://datatracker.ietf.org/doc/html/rfc8878) compression of HTTP responses on the fly (dynamically).
+**`SWS`** provides [`Gzip`](https://datatracker.ietf.org/doc/html/rfc1952), [`Deflate`](https://datatracker.ietf.org/doc/html/rfc1950), [`Brotli`](https://www.ietf.org/rfc/rfc7932.txt) and [`Zstandard` (zstd)](https://datatracker.ietf.org/doc/html/rfc8878) compression of HTTP responses on the fly (dynamically).
 
 This feature is enabled by default and can be controlled by the boolean `-x, --compression` option or the equivalent [SERVER_COMPRESSION](../configuration/env#server_compression) env.
 
