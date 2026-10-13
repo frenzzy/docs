@@ -40,6 +40,12 @@ A `max-age` of _one year_ is applied only to the following file types.
 avif, bmp, bz2, css, doc, gif, gz, htc, ico, jpeg, jpg, js, jxl, map, mjs, mp3, mp4, ogg, ogv, pdf, png, rar, rtf, tar, tgz, wav, weba, webm, webp, woff, woff2, zip
 ```
 
+> [!INFO] Error responses
+>
+> The file type `max-age` values apply only to successful (`2xx`) and `304 Not Modified` responses. Other file responses, such as a `404 Not Found` for a missing `/app.css`, get the `no-cache` directive.
+>
+> With a [fallback page](error-pages.md#fallback-page-for-use-with-client-routers) configured, a `GET` for a missing file is answered with `200 OK` and the fallback page, so it still gets the file type `max-age` value.
+
 Below is an example of how to enable the feature.
 
 ```sh
