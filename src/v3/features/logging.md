@@ -270,7 +270,7 @@ A token without a value is written as `-`. `%{x_real_ip}` and `%{forwarded_for}`
 
 ### Output
 
-The rendered line is the `message` of a log entry with the `static_web_server::access_logs` target, at the `info` level, so it needs `--log-level info` or lower. Requests to the health endpoint are logged at the `debug` level. With the `json` format:
+The rendered line is the `message` of a log entry with the `static_web_server::access_logs` target, at the `info` level, so it needs `--log-level info` or lower. Requests to the health endpoint are logged at the `debug` level. A request that fails before SWS builds a response is not logged. With the `json` format:
 
 ```json
 {"timestamp":"2026-05-29T23:43:47.151533+02:00","level":"INFO","message":"192.168.1.126 - [29/May/2026:23:43:47 +0200] \"GET / HTTP/1.1\" 200 1250 \"-\" \"curl/8.7.1\"","target":"static_web_server::access_logs"}
