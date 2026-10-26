@@ -171,6 +171,10 @@ Defines a grace period in seconds after a `SIGTERM` signal is caught which will 
 
 Server TOML configuration file path. See [The TOML Configuration File](../configuration/file). Default `./sws.toml`.
 
+## SERVER_ACCESS_LOG_FORMAT
+
+Custom access log format using the `%{token}` syntax. When set, SWS logs one line per request after the response in this format, instead of the default request line. See [Access Log Format](../features/logging#access-log-format). Default empty (disabled).
+
 ## SERVER_LOG_REMOTE_ADDRESS
 
 Log incoming requests information along with its remote address if available using the `info` log level. Default `false`.
