@@ -266,7 +266,7 @@ A token is written as `%{name}`. `%%` writes a literal `%`. Any other text is co
 | `%{referer}`       | `Referer` header                                                                                    |
 | `%{timestamp}`     | Local time in the `%d/%b/%Y:%H:%M:%S %z` format, e.g. `29/May/2026:23:43:47 +0200`, honoring `TZ`  |
 
-A token without a value is written as `-`. `%{x_real_ip}` and `%{forwarded_for}` follow the `--log-x-real-ip`, `--log-forwarded-for` and `--trusted-proxies` options.
+A token without a value is written as `-`. `%{x_real_ip}` and `%{forwarded_for}` need no `--log-x-real-ip` or `--log-forwarded-for`: those options only change the default request line. When `--trusted-proxies` is set, the two tokens are logged only for requests from those IPs and are `-` otherwise.
 
 ### Output
 
