@@ -90,7 +90,7 @@ static-web-server -p 8788 -d ./public/ -g trace --log-format pretty --log-with-a
 
 ## Per-request logging
 
-When the level is `info` or lower, SWS logs one line per request with the `response` message, after the response is built. The line carries the request method, the URI as sent by the client (before [URL Rewrites](./url-rewrites)) and the response `status`, including for responses that end the request early, such as redirects, `405 Method Not Allowed` or the health endpoints. Requests to the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`) are logged at `debug` level instead, to avoid noise from frequent probes.
+When the level is `info` or lower, SWS logs one line per request with the `response` message, once the response body is sent or aborted. The line carries the request method, the URI as sent by the client (before [URL Rewrites](./url-rewrites)) and the response `status`, including for responses that end the request early, such as redirects or `405 Method Not Allowed`. Requests to the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`) are logged at `debug` level instead, to avoid noise from frequent probes.
 
 ```json
 {
@@ -104,7 +104,7 @@ When the level is `info` or lower, SWS logs one line per request with the `respo
 }
 ```
 
-The `status` field is omitted when SWS fails to build a response. The `remote_addr`, `x_real_ip` and `real_remote_ip` fields are added when the corresponding logging options are enabled and a value is available. Fields without a value are omitted.
+No line is logged when SWS fails to build a response. The `remote_addr`, `x_real_ip` and `real_remote_ip` fields are added when the corresponding logging options are enabled and a value is available. Fields without a value are omitted.
 
 ## Log Remote Addresses
 
@@ -239,7 +239,7 @@ curl "http://[::1]:8080" --header "X-Forwarded-For: <iframe src=//malware.attack
 
 **`SWS`** can write one access log line per request in a format you define, for example the nginx or NCSA combined format. The line is written when the response body is finished, so it carries the status code, the number of body bytes sent and the duration of the whole transfer.
 
-This feature is disabled by default. Set a format with the `--access-log-format` option, the equivalent [SERVER_ACCESS_LOG_FORMAT](./../configuration/env#server_access_log_format) env or the `access-log-format` key under `[general]` in the [TOML file](./../configuration/file). When a format is set, it replaces the `incoming request` line described in [Per-request logging](#per-request-logging).
+This feature is disabled by default. Set a format with the `--access-log-format` option, the equivalent [SERVER_ACCESS_LOG_FORMAT](./../configuration/env#server_access_log_format) env or the `access-log-format` key under `[general]` in the [TOML file](./../configuration/file). When a format is set, it replaces the `response` line described in [Per-request logging](#per-request-logging).
 
 ```sh
 static-web-server -p 8787 -d ./public/ -g info \

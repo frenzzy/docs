@@ -181,7 +181,7 @@ Custom access log format using the `%{token}` syntax. When set, SWS logs one lin
 
 ## SERVER_LOG_REMOTE_ADDRESS
 
-Log incoming requests information along with its remote address if available using the `info` log level. Default `false`.
+Log the remote address of each request, if available. Default `false`.
 
 ## SERVER_LOG_X_REAL_IP
 

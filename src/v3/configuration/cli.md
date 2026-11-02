@@ -105,7 +105,7 @@ Options:
       --access-log-format <ACCESS_LOG_FORMAT>
           Custom access log format string using %{token} syntax. When set, replaces the default request logging with a configurable format that includes response data. Tokens: method, uri, status, bytes, duration, remote_addr, x_real_ip, forwarded_for, host, user_agent, referer, timestamp, version. x_real_ip and forwarded_for are logged only for requests from --trusted-proxies, if set. Example: '%{remote_addr} "%{method} %{uri}" %{status} %{bytes}' [env: SERVER_ACCESS_LOG_FORMAT=] [default: ""]
       --log-remote-address [<LOG_REMOTE_ADDRESS>]
-          Log incoming requests information along with its remote address if available using the `info` log level [env: SERVER_LOG_REMOTE_ADDRESS=] [default: false] [possible values: true, false]
+          Log the remote address of each request, if available [env: SERVER_LOG_REMOTE_ADDRESS=] [default: false] [possible values: true, false]
       --log-x-real-ip [<LOG_X_REAL_IP>]
           Log the X-Real-IP header for remote IP information [env: SERVER_LOG_X_REAL_IP=] [default: false] [possible values: true, false]
       --log-forwarded-for [<LOG_FORWARDED_FOR>]
