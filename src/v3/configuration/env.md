@@ -167,9 +167,17 @@ It provides [The "Basic" HTTP Authentication Scheme](https://datatracker.ietf.or
 
 Defines a grace period in seconds after a `SIGTERM` signal is caught which will delay the server before shutting it down gracefully. The maximum value is `255` seconds. Default `0`.
 
+## SERVER_IDLE_TIMEOUT
+
+Defines the time in seconds after which a connection without any reads or writes is closed. An HTTP/1 request header must also arrive within this time. Use `0` to disable it. The maximum value is `65535` seconds. See [Idle Connection Timeout](../features/idle-timeout.md). Default `30`.
+
 ## SERVER_CONFIG_FILE
 
 Server TOML configuration file path. See [The TOML Configuration File](../configuration/file). Default `./sws.toml`.
+
+## SERVER_ACCESS_LOG_FORMAT
+
+Custom access log format using the `%{token}` syntax. When set, SWS logs one line per request after the response in this format, instead of the default request line. See [Access Log Format](../features/logging#access-log-format). Default empty (disabled).
 
 ## SERVER_LOG_REMOTE_ADDRESS
 
@@ -213,7 +221,7 @@ Set a default `charset=utf-8` parameter on limited set of `text` responses that 
 
 ## SERVER_HEALTH
 
-Add a `/health` endpoint that doesn't generate any log entry and returns a `200` status code. This is especially useful with Kubernetes liveness and readiness probes. Default `false` (disabled).
+Add the `/livez` (liveness) and `/readyz` (readiness) endpoints for Kubernetes-style probes. They answer `GET` and `HEAD` with `200 OK` and log requests at `debug` level only. See [Health endpoint](../features/health-endpoint.md) for details. Default `false` (disabled).
 
 ## SERVER_METRICS
 

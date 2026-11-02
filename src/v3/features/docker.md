@@ -268,9 +268,14 @@ spec:
         - --health
       ports:
         - containerPort: 8787
+          name: http
       livenessProbe:
         httpGet:
-          path: /health
+          path: /livez
+          port: http
+      readinessProbe:
+        httpGet:
+          path: /readyz
           port: http
 ```
 

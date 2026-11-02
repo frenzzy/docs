@@ -6,6 +6,7 @@ The HTTP/1.1 is the protocol by default and can be used by specifying a host add
 >
 > - Either `--host`, `--port` and `--root` have defaults (optional values) so they can be specified or omitted as required.
 > - The server provides [Termination Signal](https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html) handling with [Graceful Shutdown](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace) ability by default.
+> - Idle connections are closed after `30` seconds by default. See [Idle Connection Timeout](./idle-timeout.md).
 
 Below is an example of how to run the server using HTTP/1.
 

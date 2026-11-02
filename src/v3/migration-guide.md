@@ -116,6 +116,26 @@ The v2 supports running SWS as a WASM/WASI binary (via Wasmer). However, v3 stil
 
 **Action:** For now, if you run SWS on WASM/WASI, stay on v2 or migrate to a native binary (Linux, macOS, Windows).
 
+### 10. Health endpoint replaced by `/livez` and `/readyz`
+
+|                 | v2         | v3                     |
+| --------------- | ---------- | ---------------------- |
+| Liveness probe  | `/health`  | `/livez`               |
+| Readiness probe | `/health`  | `/readyz`              |
+| Enable          | `--health` | `--health` (unchanged) |
+
+v3 no longer serves `/health`. With `--health` enabled, requests to `/health` go to the static file handler like any other path, which usually returns `404 Not Found`. The `--health` flag, the `SERVER_HEALTH` env var and the `health` TOML key are unchanged.
+
+**Action:** Point liveness probes at `/livez` and readiness probes at `/readyz`. Update any load balancer or monitoring check that requests `/health`.
+
+See the [Health endpoint](./features/health-endpoint.md) page for more details.
+
+### 11. Idle connections are now closed
+
+v2 kept idle connections open until the client closed them. v3 closes connections with no reads or writes for `30` seconds. See [Idle Connection Timeout](./features/idle-timeout.md).
+
+**Action:** Usually none. Use `--idle-timeout` to change the timeout, or `0` to disable it.
+
 ## Quick migration checklist
 
 1. **Port:** Add `--port 80` if you were relying on the default.
@@ -127,3 +147,5 @@ The v2 supports running SWS as a WASM/WASI binary (via Wasmer). However, v3 stil
 7. **Logging:** Add `--log-format pretty` if you prefer old-style human-readable logs.
 8. **TOML `text-charset`:** Change `"utf-8"` string to `true` boolean.
 9. **WebAssembly:** Migrate to a native binary — Wasm is no longer supported.
+10. **Health endpoint:** Replace `/health` with `/livez` (liveness) and `/readyz` (readiness) in probes and checks.
+11. **Idle timeout:** No action needed (now on by default, `30` seconds). Add `--idle-timeout 0` to turn off.

@@ -104,9 +104,10 @@ The types considered compressible include all `text/*` MIME types, plus `applica
 
 | Setting                      | Default         | Rationale                                                                                                          |
 | ---------------------------- | --------------- | ------------------------------------------------------------------------------------------------------------------ |
-| Health endpoint              | disabled        | Opt-in via `--health`. Returns `200 OK` at `/health` with no log noise. Designed for Kubernetes probes.            |
+| Health endpoints             | disabled        | Opt-in via `--health`. Returns `200 OK` at `/livez` and `/readyz` with no log noise. For Kubernetes probes.        |
 | Metrics endpoint             | disabled        | Opt-in via `--metrics`. Exposes Prometheus metrics at `/metrics`.                                                  |
 | Markdown content negotiation | disabled        | Opt-in. When enabled, serves `.md` files for `Accept: text/markdown` requests.                                     |
 | Maintenance mode             | disabled        | Opt-in for planned downtime. Returns `503` with a custom page.                                                     |
 | Grace period                 | `0s` (no delay) | SIGTERM triggers an immediate graceful shutdown. Set a delay (max 255s) if your load balancer needs time to drain. |
+| Idle timeout                 | `30s`           | Connections with no traffic are closed, so abandoned ones don't pile up and use up file descriptors.               |
 | Config file                  | `./sws.toml`    | Auto-loaded if present. TOML format for settings that need more structure than CLI flags.                          |

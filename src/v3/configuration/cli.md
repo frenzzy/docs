@@ -98,8 +98,12 @@ Options:
           It provides The "Basic" HTTP Authentication scheme using credentials as "user-id:password" pairs. Password must be encoded using the "BCrypt" password-hashing function [env: SERVER_BASIC_AUTH=] [default: ""]
   -q, --grace-period <GRACE_PERIOD>
           Defines a grace period in seconds after a `SIGTERM` signal is caught which will delay the server before to shut it down gracefully. The maximum value is 255 seconds [env: SERVER_GRACE_PERIOD=] [default: 0]
+      --idle-timeout <IDLE_TIMEOUT>
+          Defines the time in seconds after which a connection without any reads or writes is closed. An HTTP/1 request header must also arrive within this time. Use `0` to disable it. The maximum value is 65535 seconds [env: SERVER_IDLE_TIMEOUT=] [default: 30]
   -w, --config-file <CONFIG_FILE>
           Server TOML configuration file path [env: SERVER_CONFIG_FILE=] [default: ./sws.toml]
+      --access-log-format <ACCESS_LOG_FORMAT>
+          Custom access log format string using %{token} syntax. When set, replaces the default request logging with a configurable format that includes response data. Tokens: method, uri, status, bytes, duration, remote_addr, x_real_ip, forwarded_for, host, user_agent, referer, timestamp, version. x_real_ip and forwarded_for are logged only for requests from --trusted-proxies, if set. Example: '%{remote_addr} "%{method} %{uri}" %{status} %{bytes}' [env: SERVER_ACCESS_LOG_FORMAT=] [default: ""]
       --log-remote-address [<LOG_REMOTE_ADDRESS>]
           Log incoming requests information along with its remote address if available using the `info` log level [env: SERVER_LOG_REMOTE_ADDRESS=] [default: false] [possible values: true, false]
       --log-x-real-ip [<LOG_X_REAL_IP>]
@@ -121,7 +125,7 @@ Options:
       --text-charset [<TEXT_CHARSET>]
           Set a default `charset=utf-8` parameter on limited set of `text` responses that don't already have one [env: SERVER_TEXT_CHARSET=] [default: true] [possible values: true, false]
       --health [<HEALTH>]
-          Add a /health endpoint that doesn't generate any log entry and returns a 200 status code. This is especially useful with Kubernetes liveness and readiness probes [env: SERVER_HEALTH=] [default: false] [possible values: true, false]
+          Add the `/livez` (liveness) and `/readyz` (readiness) endpoints for Kubernetes-style probes. They answer `GET` and `HEAD` with `200 OK` and log requests at `debug` level only [env: SERVER_HEALTH=] [default: false] [possible values: true, false]
       --metrics [<METRICS>]
           Enable the /metrics endpoint that exposes Prometheus metrics for HTTP requests, connections, and latency [env: SERVER_METRICS=] [default: false] [possible values: true, false]
       --maintenance-mode [<MAINTENANCE_MODE>]

@@ -8,7 +8,7 @@ The feature is disabled by default and can be controlled by the boolean `--maint
 
 ## How it works
 
-When the feature is enabled, SWS will respond _always_ with the specified (or default) status code and HTML content to every request ignoring all SWS features. Except the [Health check](./health-endpoint.md), [CORS](./cors.md) and [Basic Authentication](./basic-authentication.md) features.
+When the feature is enabled, SWS will respond _always_ with the specified (or default) status code and HTML content to every request ignoring all SWS features. Except the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`), [CORS](./cors.md) and [Basic Authentication](./basic-authentication.md) features.
 
 ## HTTP Status Code
 

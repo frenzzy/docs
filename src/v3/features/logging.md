@@ -90,7 +90,7 @@ static-web-server -p 8788 -d ./public/ -g trace --log-format pretty --log-with-a
 
 ## Per-request logging
 
-When the level is `info` or lower, SWS logs one line per request with the `response` message, after the response is built. The line carries the request method, the URI as sent by the client (before [URL Rewrites](./url-rewrites)) and the response `status`, including for responses that end the request early, such as redirects, `405 Method Not Allowed` or the health endpoint. Requests to the health endpoint are logged at `debug` level instead, to avoid noise from frequent probes.
+When the level is `info` or lower, SWS logs one line per request with the `response` message, after the response is built. The line carries the request method, the URI as sent by the client (before [URL Rewrites](./url-rewrites)) and the response `status`, including for responses that end the request early, such as redirects, `405 Method Not Allowed` or the health endpoints. Requests to the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`) are logged at `debug` level instead, to avoid noise from frequent probes.
 
 ```json
 {
@@ -234,6 +234,63 @@ curl "http://[::1]:8080" --header "X-Forwarded-For: <iframe src=//malware.attack
   "target": "static_web_server::log_addr"
 }
 ```
+
+## Access Log Format
+
+**`SWS`** can write one access log line per request in a format you define, for example the nginx or NCSA combined format. The line is written when the response body is finished, so it carries the status code, the number of body bytes sent and the duration of the whole transfer.
+
+This feature is disabled by default. Set a format with the `--access-log-format` option, the equivalent [SERVER_ACCESS_LOG_FORMAT](./../configuration/env#server_access_log_format) env or the `access-log-format` key under `[general]` in the [TOML file](./../configuration/file). When a format is set, it replaces the `incoming request` line described in [Per-request logging](#per-request-logging).
+
+```sh
+static-web-server -p 8787 -d ./public/ -g info \
+    --access-log-format '%{remote_addr} - [%{timestamp}] "%{method} %{uri} %{version}" %{status} %{bytes} "%{referer}" "%{user_agent}"'
+```
+
+```toml
+[general]
+access-log-format = '%{remote_addr} - [%{timestamp}] "%{method} %{uri} %{version}" %{status} %{bytes} "%{referer}" "%{user_agent}"'
+```
+
+### Tokens
+
+A token is written as `%{name}`. `%%` writes a literal `%`. Any other text is copied as is. SWS validates the format at startup and refuses to start on an unknown token, an unclosed `%{` or a `%` followed by another character.
+
+| Token              | Value                                                                                                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `%{method}`        | Request method, e.g. `GET`                                                                                                                                                                              |
+| `%{uri}`           | Path and query of the request URI as sent by the client, before [URL Rewrites](./url-rewrites), without scheme or authority. For a `CONNECT` request, the authority-form target, e.g. `example.com:443` |
+| `%{version}`       | HTTP version, e.g. `HTTP/1.1`                                                                                                                                                                           |
+| `%{status}`        | Response status code                                                                                                                                                                                    |
+| `%{bytes}`         | Number of response body bytes sent, after on-the-fly compression, without the headers. `-` when no body bytes were sent, always for `HEAD`, `204` and `304` (like `%b` in the Common Log Format)        |
+| `%{duration}`      | Time from the start of request handling until the response body is finished, in seconds with microsecond precision                                                                                      |
+| `%{remote_addr}`   | Client IP address                                                                                                                                                                                       |
+| `%{x_real_ip}`     | `X-Real-IP` address, see [Logging Client IP from X-Real-IP header](#logging-client-ip-from-x-real-ip-header)                                                                                            |
+| `%{forwarded_for}` | First `X-Forwarded-For` address, see [Logging Client IP from X-Forwarded-For header](#logging-client-ip-from-x-forwarded-for-header)                                                                    |
+| `%{host}`          | Host as sent by the client, before [URL Rewrites](./url-rewrites): the request URI authority (HTTP/2 `:authority` or an absolute-form request target) without user info, else the `Host` header         |
+| `%{user_agent}`    | `User-Agent` header                                                                                                                                                                                     |
+| `%{referer}`       | `Referer` header                                                                                                                                                                                        |
+| `%{timestamp}`     | Local time when the line is written, in the Common Log Format, e.g. `29/May/2026:23:43:47 +0200`, honoring `TZ`                                                                                         |
+
+A token without a value, or with an empty one, is written as `-`. `%{x_real_ip}` and `%{forwarded_for}` need no `--log-x-real-ip` or `--log-forwarded-for`: those options only change the default request line. When `--trusted-proxies` is set, the two tokens are logged only for requests from those IPs and are `-` otherwise.
+
+### Output
+
+The rendered line is the `message` of a log entry with the `static_web_server::access_logs` target, at the `info` level. The default log level is `error`, so pass `--log-level info` (or `debug`, `trace`) to see it. Requests to the [health endpoints](./health-endpoint) (`/livez` and `/readyz`) are logged at the `debug` level. A request that fails before SWS builds a response is not logged. If the client closes the connection before the body is fully sent, the line is still written, with the bytes sent so far and the time until the transfer ended. With the `json` format:
+
+```json
+{
+  "timestamp": "2026-05-29T23:43:47.151533+02:00",
+  "level": "INFO",
+  "message": "192.168.1.126 - [29/May/2026:23:43:47 +0200] \"GET / HTTP/1.1\" 200 1250 \"-\" \"curl/8.7.1\"",
+  "target": "static_web_server::access_logs"
+}
+```
+
+### Escaping
+
+The URI and the `Host`, `User-Agent` and `Referer` headers come from the client. SWS writes bytes outside printable ASCII, `"` and `\` in them as `\xHH` (uppercase hex), so a client cannot close a quoted field or inject a fake log line. For example, the `User-Agent` value `x" 200 "forged` is logged as `x\x22 200 \x22forged`.
+
+An escaped value longer than 4 KiB is cut and ends with `...`, so a large header cannot produce a large log line.
 
 ## File Logging
 

@@ -10,6 +10,7 @@ This feature is disabled by default and can be activated via the boolean `--http
 > - When HTTP/2 is enabled, [Security Headers](./security-headers.md) are also enabled automatically (via TLS).
 > - See the [TLS](./tls.md) page for supported key formats and cipher suite defaults.
 > - The server provides [Termination Signal](https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html) handling with [Graceful Shutdown](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace) ability by default.
+> - Idle connections are closed after `30` seconds by default. See [Idle Connection Timeout](./idle-timeout.md).
 
 ## Example
 
