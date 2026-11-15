@@ -4,6 +4,8 @@
 
 This feature is disabled by default and can be activated via the boolean `-t, --http2` option as well as string arguments `--http2-tls-cert` (TLS certificate file path) and `--http2-tls-key` (private key file path).
 
+HTTP/2 is only served over TLS. Its request header list is limited to 16 KiB.
+
 ## Safe TLS defaults
 
 SWS comes with safe TLS defaults for underlying cryptography.
@@ -84,7 +86,7 @@ Only the following private key file formats are supported:
 >
 > - Either `--host`, `--port` and `--root` have defaults (optional values) so they can be specified or omitted as required.
 > - Don't forget to adjust the proper `--port` value for the HTTP/2 & TLS feature.
-> - When this feature is enabled (`--http2=true`) then the [security headers](./security-headers.md) are also enabled automatically.
+> - When this feature is enabled (`--http2=true`) then the [security headers](./security-headers.md) are also enabled automatically, unless `--security-headers=false` is set via CLI or env.
 > - The server provides [Termination Signal](https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html) handling with [Graceful Shutdown](https://cloud.google.com/blog/products/containers-kubernetes/kubernetes-best-practices-terminating-with-grace) ability by default.
 
 ```sh

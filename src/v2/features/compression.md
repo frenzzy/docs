@@ -48,6 +48,10 @@ Compression is only applied to files with the MIME types listed below, indicatin
   - `image/x-icon`
   - `image/vnd.microsoft.icon`
 
+## Responses not compressed
+
+Partial content (`206`) responses and responses without a body (`1xx`, `204`, `304`) are not compressed.
+
 ## Compression level
 
 SWS allows selecting the compression level via `--compression-level` command line option or the equivalent [SERVER_COMPRESSION_LEVEL](../configuration/environment-variables.md#server_compression_level) env. The available values are `fastest`, `best` and `default`. `fastest` will result in the lowest CPU load but also the worst compression factor. `best` will attempt to compress the data as much as possible (not recommended with `Brotli` or `Zstandard` compression, will be very slow). `default` tries to strike a balance, choosing a compression level where compression factor is already fairly good but the CPU load is still low.

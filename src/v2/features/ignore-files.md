@@ -8,6 +8,8 @@ SWS _does ignore_ dotfiles (hidden files) by default for security reasons.
 
 As a result, SWS will respond with a `404 Not Found` status as well as hidden files won't be shown in the directory listing if enabled.
 
+On NTFS and FAT volumes, 8.3 short-name aliases of hidden files (e.g. `GIT~1` for `.git`) also get a `404 Not Found`.
+
 This feature is enabled by default and can be controlled by the boolean `--ignore-hidden-files` option or the equivalent [SERVER_IGNORE_HIDDEN_FILES](./../configuration/environment-variables.md#server_ignore_hidden_files) env.
 
 Here is an example of how to disable hidden files ignoring if wanted:

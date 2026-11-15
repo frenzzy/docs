@@ -45,15 +45,15 @@ Log incoming request information along with its Remote Address (IP) if available
 
 ## SERVER_LOG_X_REAL_IP
 
-Log the X-Real-IP header if available using the `info` log level. Default `false`.
+Log the X-Real-IP header of requests from [trusted proxies](#server_trusted_proxies) using the `info` log level. Default `false`.
 
 ## SERVER_LOG_FORWARDED_FOR
 
-Log the X-Forwarded-For header if available using the `info` log level. Default `false`.
+Log the first X-Forwarded-For address of requests from [trusted proxies](#server_trusted_proxies) using the `info` log level. Default `false`.
 
 ## SERVER_TRUSTED_PROXIES
 
-A comma separated list of IP addresses to accept the X-Forwarded-For header from. An empty string means trust all IPs. Default `""`
+A comma separated list of proxy IP addresses to use the X-Real-IP and X-Forwarded-For headers from. An empty string trusts no one, so the headers are not logged. IPv4 entries also match their IPv4-mapped IPv6 form (`::ffff:a.b.c.d`). Default `""`
 
 ## SERVER_ERROR_PAGE_404
 
@@ -147,7 +147,7 @@ Specify list of enabled format(s) for directory download. Format supported: `tar
 
 ## SERVER_SECURITY_HEADERS
 
-Enable security headers by default when the HTTP/2 feature is activated. Headers included: `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` (2 years max-age), `X-Frame-Options: DENY` and `Content-Security-Policy: frame-ancestors 'self'`. Default `false` (disabled).
+Enable security headers. Enabled by default when HTTP/2 (`--http2`) is activated. Headers included: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff` and `Content-Security-Policy: frame-ancestors 'self'`. With `--http2` (TLS), also `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload` (2 years max-age), which is never sent over plain HTTP. Default `false` (disabled).
 
 ## SERVER_CACHE_CONTROL_HEADERS
 

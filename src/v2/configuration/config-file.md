@@ -86,7 +86,7 @@ log-remote-address = false
 #### Log real IP from X-Forwarded-For header if available
 log-forwarded-for = false
 
-#### IPs to accept the X-Forwarded-For header from. Empty means all
+#### Proxy IPs to use the X-Real-IP and X-Forwarded-For headers from. Empty means none
 trusted-proxies = []
 
 #### Redirect to trailing slash in the requested directory uri

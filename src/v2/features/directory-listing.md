@@ -143,3 +143,5 @@ static-web-server \
 ```
 
 When **Directory Download** is enabled, append `?download` to a directory URL to download it. A link will also be added to the top part of **HTML** output format.
+
+Symlinks resolving outside the root directory are not included in the archive.

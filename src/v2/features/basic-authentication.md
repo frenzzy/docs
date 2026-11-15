@@ -44,6 +44,10 @@ htpasswd -nBC10 "username"
 > If you are using `SERVER_BASIC_AUTH` env via a `docker-compose.yml` file don't forget to replace the single `$` (dollar sign) with a `$$` (double-dollar sign) if you want those individual `$` dollar signs in your configuration to be treated by Docker as literals.<br>
 > More details in [the Docker Compose file: variable substitution](https://docs.docker.com/compose/compose-file/compose-file-v2/#variable-substitution) page.
 
+> [!INFO] OPTIONS requests
+>
+> `OPTIONS` requests also require credentials, except CORS preflight requests (with `Origin` and `Access-Control-Request-Method` headers) when [CORS](./cors.md) is enabled.
+
 Finally, assign the credentials and run the server.
 
 ```sh

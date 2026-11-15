@@ -16,6 +16,8 @@ This feature is enabled by default and can be controlled by the boolean `-e, --c
 
 Control headers are applied only to the following file types with the corresponding `max-age` values.
 
+They are only applied to `2xx` and `304` responses. Other responses (e.g. `404`) get `Cache-Control: no-cache`.
+
 ### One day
 
 A `max-age` of _one day_ duration is used by default.

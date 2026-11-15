@@ -86,7 +86,7 @@ The relevant log output:
 ```log
 INFO static_web_server::logger: logging level: info
 <...>
-INFO static_web_server::info: log requests with remote IP addresses: enabled=true
+INFO static_web_server::log_addr: log requests with remote IP addresses: enabled=true
 <...>
 INFO static_web_server::handler: incoming request: method=GET uri=/ remote_addr=192.168.1.126:57625
 INFO static_web_server::handler: incoming request: method=GET uri=/favicon.ico remote_addr=192.168.1.126:57625
@@ -106,20 +106,20 @@ INFO static_web_server::handler: incoming request: method=GET uri=/ x_real_ip=20
 
 If the value of the `X-Real-IP` header does not parse as an IP address, no value will be logged.
 
-To restrict the logging to only requests that originate from trusted proxy IPs, you can use the `--trusted-proxies` option, or the equivalent [SERVER_TRUSTED_PROXIES](../configuration/environment-variables.md#server_trusted_proxies) env. This should be a list of IPs, separated by commas. An empty list (the default) indicates that all IPs should be trusted.
+The header is only logged for requests from trusted proxy IPs, set via the `--trusted-proxies` option or the equivalent [SERVER_TRUSTED_PROXIES](../configuration/environment-variables.md#server_trusted_proxies) env. This should be a list of IPs, separated by commas. An empty list (the default) trusts no one, so the header is not logged and a warning is printed at startup.
 
 ## Logging Client IP from X-Forwarded-For header
 
-> Note: This header should only be trusted when you know your upstream is handling X-Forwarded-For securely and when using the `--trusted-proxies` option.
+> Note: This header should only be trusted when you know your upstream is handling X-Forwarded-For securely.
 
 When used behind a reverse proxy the reported `remote_addr` indicates the proxies IP address and port, not the client's real IP.
 The Proxy server can be configured to provide the [X-Forwarded-For header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For), containing a comma-separated list of IP addresses, starting with the _real remote client IP_, and all following intermediate proxies (if any).
 
-To enable logging of the real remote IP, enable the `--log-forwarded-for` option or the equivalent [SERVER_LOG_FORWARDED_FOR](../configuration/environment-variables.md#server_log_forwarded_for) env. By default this will log all requests which have a correctly formatted `X-Forwarded-For` header.
+To enable logging of the real remote IP, enable the `--log-forwarded-for` option or the equivalent [SERVER_LOG_FORWARDED_FOR](../configuration/environment-variables.md#server_log_forwarded_for) env. The first address of a correctly formatted `X-Forwarded-For` header is logged.
 
 Since the content of the `X-Forwarded-For` header can be changed by all proxies in the chain, the remote IP address reported may not be trusted.
 
-To restrict the logging to only requests that originate from trusted proxy IPs, you can use the `--trusted-proxies` option, or the equivalent [SERVER_TRUSTED_PROXIES](../configuration/environment-variables.md#server_trusted_proxies) env. This should be a list of IPs, separated by commas. An empty list (the default) indicates that all IPs should be trusted.
+The header is only logged for requests from trusted proxy IPs, set via the `--trusted-proxies` option or the equivalent [SERVER_TRUSTED_PROXIES](../configuration/environment-variables.md#server_trusted_proxies) env. This should be a list of IPs, separated by commas. An empty list (the default) trusts no one, so the header is not logged and a warning is printed at startup. IPv4 entries also match their IPv4-mapped IPv6 form (`::ffff:a.b.c.d`).
 
 Command used for the following examples:
 
@@ -132,9 +132,10 @@ Look for these lines in the log output:
 ```log
 <...>
 INFO static_web_server::info: log level: info
-INFO static_web_server::info: log requests with remote IP addresses: enabled=false
-INFO static_web_server::info: log X-Forwarded-For real remote IP addresses: enabled=true
-INFO static_web_server::info: trusted IPs for X-Forwarded-For: [::1]
+INFO static_web_server::log_addr: log requests with remote IP addresses: enabled=false
+INFO static_web_server::log_addr: log X-Real-IP header: enabled=false
+INFO static_web_server::log_addr: log X-Forwarded-For header: enabled=true
+INFO static_web_server::log_addr: trusted IPs for X-Real-IP and X-Forwarded-For: [::1]
 <...>
 ```
 

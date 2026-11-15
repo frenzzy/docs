@@ -14,7 +14,9 @@ This feature is disabled by default and can be controlled by the boolean `--metr
 | `sws_http_requests_inflight`        | Gauge     | —                    | Requests currently being processed                                       |
 | `sws_http_connections_active`       | Gauge     | —                    | Active HTTP connections                                                  |
 
-When built with the `experimental` feature and `RUSTFLAGS="--cfg tokio_unstable"`, Tokio runtime metrics (worker threads, task scheduling, etc.) are also included in the output.
+The `host` label is a name listed under [Virtual Hosting](./virtual-hosting.md), otherwise `other`. The `method` label is `GET`, `HEAD` or `OPTIONS`, otherwise `other`.
+
+When built with the `all` or `experimental` feature and `RUSTFLAGS="--cfg tokio_unstable"`, Tokio runtime metrics (worker threads, task scheduling, etc.) are also included in the output.
 
 ## Example
 
@@ -29,10 +31,10 @@ curl http://localhost/metrics
 ```text
 # HELP sws_http_requests_total Total HTTP requests by method, status class, and host.
 # TYPE sws_http_requests_total counter
-sws_http_requests_total{host="localhost",method="GET",status="2xx"} 42
+sws_http_requests_total{host="other",method="GET",status="2xx"} 42
 # HELP sws_http_request_duration_seconds HTTP request duration in seconds by method, status class, and host.
 # TYPE sws_http_request_duration_seconds histogram
-sws_http_request_duration_seconds_bucket{host="localhost",method="GET",status="2xx",le="0.001"} 38
+sws_http_request_duration_seconds_bucket{host="other",method="GET",status="2xx",le="0.001"} 38
 ...
 # HELP sws_http_connections_active Number of currently active HTTP connections.
 # TYPE sws_http_connections_active gauge

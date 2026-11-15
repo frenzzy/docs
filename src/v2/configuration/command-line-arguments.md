@@ -77,7 +77,7 @@ Options:
       --directory-listing-download=<DIRECTORY_LISTING_DOWNLOAD>
           Specify list of enabled format(s) for directory download. Format supported: `targz`. Default to empty list (disabled) [env: SERVER_DIRECTORY_LISTING_DOWNLOAD=] [possible values: targz]
       --security-headers [<SECURITY_HEADERS>]
-          Enable security headers by default when HTTP/2 feature is activated. Headers included: "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload" (2 years max-age), "X-Frame-Options: DENY" and "Content-Security-Policy: frame-ancestors 'self'" [env: SERVER_SECURITY_HEADERS=] [default: false] [possible values: true, false]
+          Enable security headers. Enabled by default when HTTP/2 (`--http2`) is activated. Headers included: "X-Frame-Options: DENY", "X-Content-Type-Options: nosniff" and "Content-Security-Policy: frame-ancestors 'self'". With `--http2` (TLS), also "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload" (2 years max-age), which is never sent over plain HTTP. Behind a TLS-terminating proxy, add `Strict-Transport-Security` at the proxy or with an `[[advanced.headers]]` rule [env: SERVER_SECURITY_HEADERS=] [default: false] [possible values: true, false]
   -e, --cache-control-headers [<CACHE_CONTROL_HEADERS>]
           Enable cache control headers for incoming requests based on a set of file types. The file type list can be found on `src/control_headers.rs` file [env: SERVER_CACHE_CONTROL_HEADERS=] [default: true] [possible values: true, false]
       --basic-auth <BASIC_AUTH>
@@ -89,11 +89,11 @@ Options:
       --log-remote-address [<LOG_REMOTE_ADDRESS>]
           Log incoming requests information along with its remote address if available using the `info` log level [env: SERVER_LOG_REMOTE_ADDRESS=] [default: false] [possible values: true, false]
       --log-x-real-ip [<LOG_X_REAL_IP>]
-          Log the X-Real-IP header for remote IP information [env: SERVER_LOG_X_REAL_IP=] [default: false] [possible values: true, false]
+          Log the X-Real-IP header of requests from --trusted-proxies [env: SERVER_LOG_X_REAL_IP=] [default: false] [possible values: true, false]
       --log-forwarded-for [<LOG_FORWARDED_FOR>]
-          Log the X-Forwarded-For header for remote IP information [env: SERVER_LOG_FORWARDED_FOR=] [default: false] [possible values: true, false]
+          Log the first X-Forwarded-For address of requests from --trusted-proxies [env: SERVER_LOG_FORWARDED_FOR=] [default: false] [possible values: true, false]
       --trusted-proxies <TRUSTED_PROXIES>
-          List of IPs to use X-Forwarded-For from. The default is to trust all [env: SERVER_TRUSTED_PROXIES=]
+          List of proxy IPs to use the X-Real-IP and X-Forwarded-For headers from. The default trusts no one, so the headers are not logged unless set. IPv4 entries also match their IPv4-mapped IPv6 form (`::ffff:a.b.c.d`) [env: SERVER_TRUSTED_PROXIES=]
       --redirect-trailing-slash [<REDIRECT_TRAILING_SLASH>]
           Check for a trailing slash in the requested directory URI and redirect permanently (308) to the same path with a trailing slash suffix if it is missing [env: SERVER_REDIRECT_TRAILING_SLASH=] [default: true] [possible values: true, false]
       --ignore-hidden-files [<IGNORE_HIDDEN_FILES>]

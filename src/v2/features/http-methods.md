@@ -8,6 +8,10 @@ outline: deep
 
 ## OPTIONS Method
 
+> [!INFO] Basic Authentication
+>
+> When [Basic Authentication](./basic-authentication.md) is enabled, `OPTIONS` requests also require credentials, except [CORS preflight requests](#preflight-requests-in-cors) when [CORS](./cors.md) is enabled.
+
 ### Identifying allowed request methods
 
 The HTTP [OPTIONS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/OPTIONS) method can be used to send a request to check for permitted communication options for either a given URL or server.
