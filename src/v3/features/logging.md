@@ -304,9 +304,9 @@ When enabled and the request has a valid `traceparent` header, the log lines wri
 
 - `trace_id`: the `trace-id` of the header (32 lowercase hex characters).
 - `span_id`: the `parent-id` of the header (16 lowercase hex characters), which is the span of the caller. SWS does not create spans of its own.
-- `trace_flags`: the `trace-flags` of the header (2 lowercase hex characters).
+- `trace_flags`: the `trace-flags` of the header (2 lowercase hex characters). For a `traceparent` version higher than `00`, only the `sampled` flag is kept (`01` or `00`), since the other flags are not defined by version `00`.
 
-The fields are added to the per-request line (the `response` line of [Per-request logging](#per-request-logging), or the line of the [Access Log Format](#access-log-format) when one is set) and to the other lines logged while the request is handled, such as the `error_page` warning of a `404`. Lines logged outside the request handler, such as connection errors or lines of the HTTPS redirect listener, do not get them. The fields are added at every log level, e.g. to the `404` warning when the level is `warn`.
+The fields are added to the per-request line (the `response` line of [Per-request logging](#per-request-logging), or the line of the [Access Log Format](#access-log-format) when one is set) and to the other lines logged while the request is handled or its response body is sent, such as the `error_page` warning of a `404`. Lines logged outside the request handler, such as connection errors or lines of the HTTPS redirect listener, do not get them. The fields are added at every log level, e.g. to the `404` warning when the level is `warn`.
 
 ```sh
 static-web-server -p 8787 -d ./public/ -g info --log-format json --log-trace-context
@@ -323,6 +323,8 @@ curl "http://localhost:8787/missing.css" \
 ```
 
 SWS only reads the header. It does not generate trace IDs, export spans or change the headers of the request or the response. Missing, invalid or repeated `traceparent` headers are ignored; see the specification's [versioning rules](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).
+
+Unlike `X-Real-IP` and `X-Forwarded-For`, which are logged only from [trusted proxies](#trusted-proxies), the `traceparent` header is taken from any client. A client that reaches SWS directly can put the trace ID of its choice on the log lines of its requests, so the fields are only reliable behind a proxy that sets or replaces the header (see [Denial of service](https://www.w3.org/TR/trace-context/#denial-of-service) in the specification).
 
 ## File Logging
 

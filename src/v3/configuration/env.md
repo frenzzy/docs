@@ -213,7 +213,7 @@ List of proxy IPs to use the `X-Real-IP` and `X-Forwarded-For` headers from. IPv
 
 ## SERVER_LOG_TRACE_CONTEXT
 
-Add the `trace_id`, `span_id` and `trace_flags` fields of a valid W3C `traceparent` request header to the log lines written for the request. Requires the `json` log format. See [Logging Trace Context](../features/logging.md#logging-trace-context). Default `false`.
+Add the `trace_id`, `span_id` and `trace_flags` fields of a valid W3C `traceparent` request header to the log lines written for the request. The header is taken from any client, so the fields are only reliable behind a proxy that sets or replaces it. Requires the `json` log format. See [Logging Trace Context](../features/logging.md#logging-trace-context). Default `false`.
 
 ## SERVER_REDIRECT_TRAILING_SLASH
 
