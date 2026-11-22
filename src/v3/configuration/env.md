@@ -9,7 +9,11 @@ The server can be configured via the following environment variables.
 
 ## SERVER_HOST
 
-Host address (e.g. `127.0.0.1` or `::1`). The default `::` accepts both IPv6 and IPv4 connections where the OS supports dual-stack sockets. Default `::`.
+Host address (e.g. `127.0.0.1` or `::1`). The default `::` accepts both IPv6 and IPv4 connections where the OS supports dual-stack sockets, unless `SERVER_IPV6_ONLY` is enabled. Default `::`.
+
+## SERVER_IPV6_ONLY
+
+Make the unspecified IPv6 host `::` accept IPv6 connections only, leaving the port free for IPv4. It has no effect on a specific IPv6 host and cannot be used with an IPv4 host, `SERVER_LISTEN_FD` or `SERVER_UNIX_SOCKET`. See [IPv6-Only Host](../features/ipv6-only.md). Default `false` (disabled).
 
 ## SERVER_PORT
 

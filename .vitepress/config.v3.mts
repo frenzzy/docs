@@ -53,6 +53,7 @@ export const v3: DefaultTheme.Config = {
           { text: 'Idle Connection Timeout', link: '/v3/features/idle-timeout' },
           { text: 'Maximum Connections', link: '/v3/features/max-connections' },
           { text: 'Maximum Request Header Size', link: '/v3/features/max-header-size' },
+          { text: 'IPv6-Only Host', link: '/v3/features/ipv6-only' },
           { text: 'File Descriptor Socket Passing', link: '/v3/features/file-descriptor-socket-passing' },
           { text: 'Unix Domain Socket', link: '/v3/features/unix-domain-socket' },
           { text: 'Worker Threads Customization', link: '/v3/features/worker-threads' },

@@ -21,6 +21,7 @@ Below is just an example showing all features with their default values.
 
 #### Address & Root dir
 host = "::"
+ipv6-only = false
 port = 8080
 root = "."
 

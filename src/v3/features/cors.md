@@ -23,6 +23,8 @@ static-web-server \
     # --cors-allow-origins "*"
 ```
 
+Responses to requests with an allowed `Origin` header include `Origin` in the `Vary` header, so shared caches store a response per origin. SWS appends it to any `Vary` values already set, such as `Accept` on [automatic directory listings](./directory-listing.md#automatic-format), so caches still store each listing format separately.
+
 ## Allowed headers
 
 The server also supports a list of [CORS allowed headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers) separated by commas.

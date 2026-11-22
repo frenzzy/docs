@@ -19,7 +19,9 @@ Commands:
 
 Options:
   -a, --host <HOST>
-          Host address (E.g 127.0.0.1 or ::1). The default `::` accepts both IPv6 and IPv4 connections where the OS supports dual-stack sockets [env: SERVER_HOST=] [default: ::]
+          Host address (E.g 127.0.0.1 or ::1). The default `::` accepts both IPv6 and IPv4 connections where the OS supports dual-stack sockets, unless `--ipv6-only` is enabled [env: SERVER_HOST=] [default: ::]
+      --ipv6-only [<IPV6_ONLY>]
+          Make the unspecified IPv6 host `::` accept IPv6 connections only, leaving the port free for IPv4. It has no effect on a specific IPv6 host and cannot be used with an IPv4 host, `--fd` or `--unix-socket` [env: SERVER_IPV6_ONLY=] [default: false] [possible values: true, false]
   -p, --port <PORT>
           Host port [env: SERVER_PORT=] [default: 8080]
       --open [<OPEN>]

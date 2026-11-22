@@ -26,6 +26,7 @@ When running `static-web-server` with no flags, you get:
 | Setting                 | Default                           | Rationale                                                                        |
 | ----------------------- | --------------------------------- | -------------------------------------------------------------------------------- |
 | Host                    | `::` (all interfaces, dual-stack) | Reachable from any network interface, over IPv6 and IPv4 where the OS allows it. |
+| IPv6 only               | disabled                          | `::` also accepts IPv4 by default; `--ipv6-only` leaves the IPv4 port free.      |
 | Port                    | `8080`                            | Non-privileged port, no `root` needed.                                           |
 | Unix socket             | disabled                          | TCP is the common case; UDS is opt-in for reverse-proxy setups.                  |
 | File descriptor passing | disabled                          | Only needed in inetd/systemd/launchd sandboxing scenarios.                       |

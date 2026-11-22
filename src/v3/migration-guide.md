@@ -173,7 +173,7 @@ With `--page-fallback`, requests for missing assets (e.g. `/favicon.ico` or a sc
 
 v3 binds the default `--host ::` as a dual-stack socket, so it accepts IPv4 too on Windows, FreeBSD and Linux with `net.ipv6.bindv6only=1`, where v2 listened on IPv6 only. It then also reserves the port for IPv4.
 
-**Action:** If another service listens on `0.0.0.0` at the same port, SWS now fails with "address in use": change one of the ports, or bind SWS to a specific IPv6 address to stay IPv6-only.
+**Action:** If another service listens on `0.0.0.0` at the same port, SWS now fails with "address in use": change one of the ports, or add `--ipv6-only` to keep `::` IPv6-only as in v2. See [IPv6-Only Host](./features/ipv6-only.md).
 
 ## Quick migration checklist
 
@@ -192,4 +192,4 @@ v3 binds the default `--host ::` as a dual-stack socket, so it accepts IPv4 too 
 13. **Header size:** Raise `--max-header-size` if clients send headers over 16 KiB.
 14. **Cache-Control:** No action needed. HTML now gets `no-cache`.
 15. **Fallback page:** No action needed. Missing assets keep their `404`.
-16. **Dual-stack:** Make sure no other service uses the same port on `0.0.0.0`.
+16. **Dual-stack:** Make sure no other service uses the same port on `0.0.0.0`, or add `--ipv6-only`.
