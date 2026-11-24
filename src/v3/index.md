@@ -56,6 +56,7 @@ SWS is designed to be **simple by default, powerful when needed**. You can point
 | [**Maximum Request Header Size**](./features/max-header-size)                   | Reject requests whose headers are larger than a configurable limit.                                  |
 | [**Windows Service**](./features/windows-service)                               | Install SWS as a native Windows Service with `sc` or the installer.                                  |
 | [**Docker**](./features/docker)                                                 | Official images on `scratch`, `Alpine`, and `Debian` for several architectures.                      |
+| [**IPv6-Only Host**](./features/ipv6-only)                                      | Keep the default `::` host IPv6-only and leave the port free for IPv4.                               |
 | [**Unix Domain Socket**](./features/unix-domain-socket)                         | Listen on a UDS path for secure, low-latency local proxying.                                         |
 | [**File Descriptor Socket Passing**](./features/file-descriptor-socket-passing) | Pass a pre-opened socket via FD for seamless hot-reload setups.                                      |
 | [**Worker Threads**](./features/worker-threads)                                 | Tune the thread pool to balance latency and throughput.                                              |
