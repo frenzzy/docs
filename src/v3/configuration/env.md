@@ -201,15 +201,15 @@ Custom access log format using the `%{token}` syntax. When set, SWS logs one lin
 
 ## SERVER_LOG_REMOTE_ADDRESS
 
-Log the remote address of each request, if available. Default `false`.
+Log the remote address of each request, if available. The default request line logs it as `network.peer.address`, and as `client.address` unless a proxy header gives the client. See [Client addresses](../features/logging.md#client-addresses). Default `false`.
 
 ## SERVER_LOG_X_REAL_IP
 
-Log the `X-Real-IP` header of requests from `SERVER_TRUSTED_PROXIES`. Default `false`.
+Log the `X-Real-IP` header of requests from `SERVER_TRUSTED_PROXIES`. The default request line logs it as `client.address`, unless `SERVER_LOG_FORWARDED_FOR` gives one. Default `false`.
 
 ## SERVER_LOG_FORWARDED_FOR
 
-Log the first `X-Forwarded-For` address of requests from `SERVER_TRUSTED_PROXIES`. Default `false`.
+Log the client address from `X-Forwarded-For` of requests from `SERVER_TRUSTED_PROXIES`. The default request line logs it as `client.address`. Default `false`.
 
 ## SERVER_TRUSTED_PROXIES
 

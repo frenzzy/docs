@@ -58,7 +58,7 @@ static-web-server -p 8080 -d ./public/ -g info --log-format pretty
 ```log
 2026-05-29T23:44:04.703047+02:00  INFO static_web_server::server: starting Static Web Server name="static-web-server" version="2.42.0"
 2026-05-29T23:44:04.704137+02:00  INFO static_web_server::compression: auto compression enabled=true formats=deflate,gzip,brotli,zstd compression_level=Default
-2026-05-29T23:44:05.724579+02:00  INFO static_web_server::log_addr: response method=GET uri=/ status=200
+2026-05-29T23:44:05.724579+02:00  INFO static_web_server::log_addr: response http.request.method="GET" url.path="/" http.response.status_code=200 http.response.body.size=1250 duration=0.000412 user_agent.original="curl/8.7.1"
 ```
 
 ## Log Date-Timestamp
@@ -90,27 +90,72 @@ static-web-server -p 8788 -d ./public/ -g trace --log-format pretty --log-with-a
 
 ## Per-request logging
 
-When the level is `info` or lower, SWS logs one line per request with the `response` message, once the response body is sent or aborted. The line carries the request method, the URI as sent by the client (before [URL Rewrites](./url-rewrites)) and the response `status`, including for responses that end the request early, such as redirects or `405 Method Not Allowed`. Requests to the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`) are logged at `debug` level instead, to avoid noise from frequent probes.
+When the level is `info` or lower, SWS logs one line per request with the `response` message, once the response body is sent or aborted. The line carries the request method, the path and query as sent by the client (before [URL Rewrites](./url-rewrites)), the response status, the number of body bytes sent, the duration and the `User-Agent` header, including for responses that end the request early, such as redirects or `405 Method Not Allowed`. Requests to the [health endpoints](./health-endpoint.md) (`/livez` and `/readyz`) are logged at `debug` level instead, to avoid noise from frequent probes.
 
 ```json
 {
   "timestamp": "2026-05-29T23:43:47.151533+02:00",
   "level": "INFO",
   "message": "response",
-  "method": "GET",
-  "uri": "/",
-  "status": 200,
+  "http.request.method": "GET",
+  "url.path": "/missing.css",
+  "http.response.status_code": 404,
+  "http.response.body.size": 153,
+  "duration": 0.000412,
+  "user_agent.original": "curl/8.7.1",
   "target": "static_web_server::log_addr"
 }
 ```
 
-No line is logged when SWS fails to build a response. The `remote_addr`, `x_real_ip` and `real_remote_ip` fields are added when the corresponding logging options are enabled and a value is available, and the `trace_id`, `span_id` and `trace_flags` fields when [trace context logging](#logging-trace-context) is enabled. Fields without a value are omitted.
+The field names follow the OpenTelemetry [semantic conventions for HTTP](https://opentelemetry.io/docs/specs/semconv/http/http-spans/#http-server), so a collector can read them without renaming. `duration` keeps its SWS name, since the conventions define no log attribute for it:
+
+| Field                       | Value                                                                                                                                                                                                   |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `http.request.method`       | Request method, e.g. `GET`                                                                                                                                                                              |
+| `url.path`                  | Path of the request URI as sent by the client, without scheme, authority or query, the same as `%{uri}` up to the first `?`. For a `CONNECT` request, the authority-form target, e.g. `example.com:443` |
+| `url.query`                 | Query of the request URI, without the leading `?`. Omitted when the URI has no query or an empty one                                                                                                    |
+| `http.response.status_code` | Response status code                                                                                                                                                                                    |
+| `http.response.body.size`   | Number of response body bytes sent, the same as `%{bytes}` (`0` instead of `-` for an empty body). Omitted for `HEAD`, `204` and `304` responses, which send no body                                    |
+| `duration`                  | Time from the start of request handling until the response body is finished, in seconds with microsecond precision, the same value as `%{duration}`                                                     |
+| `user_agent.original`       | `User-Agent` header. Bytes that are not valid UTF-8 are replaced with `U+FFFD`, and a value longer than 4 KiB is cut and ends with `...`. Omitted when the header is missing or empty                   |
+| `client.address`            | Client IP address, see [Client addresses](#client-addresses). Omitted unless one of its options is enabled                                                                                              |
+| `network.peer.address`      | IP address of the peer of the connection, with `--log-remote-address` only                                                                                                                              |
+
+No line is logged when SWS fails to build a response. The `trace_id`, `span_id` and `trace_flags` fields are added when [trace context logging](#logging-trace-context) is enabled. Fields without a value are omitted. The `message` (`response`) and the `target` (`static_web_server::log_addr`) of the line stay the same, so filters on them keep matching.
+
+The `pretty` [log format](#log-format) uses the same field names, e.g. `http.request.method="GET"`.
+
+The `404` and other `4xx`/`5xx` responses also log a `WARN` line with the `static_web_server::error_page` target. It carries the `http.request.method`, `url.path`, `url.query` and `http.response.status_code` fields, split from the URI the same way as on the `response` line but after [URL Rewrites](./url-rewrites), plus `error`, the reason phrase of the status:
+
+```json
+{
+  "timestamp": "2026-05-29T23:43:47.151402+02:00",
+  "level": "WARN",
+  "http.request.method": "GET",
+  "url.path": "/missing.css",
+  "http.response.status_code": 404,
+  "error": "Not Found",
+  "target": "static_web_server::error_page"
+}
+```
+
+### Client addresses
+
+No address is logged by default. The options below add them, and IPv4-mapped IPv6 addresses (`::ffff:a.b.c.d`), as seen on the default dual-stack `::` listener, are logged as IPv4 (`a.b.c.d`), in the JSON fields and in the `%{remote_addr}`, `%{x_real_ip}` and `%{forwarded_for}` [access log tokens](#tokens) alike.
+
+`client.address` is the first address available, in this order:
+
+1. The `X-Forwarded-For` client, with `--log-forwarded-for`, for requests from a [trusted proxy](#trusted-proxies).
+2. The `X-Real-IP` address, with `--log-x-real-ip`, for requests from a [trusted proxy](#trusted-proxies).
+3. The remote address of the connection, with `--log-remote-address`.
+
+`network.peer.address` is the remote address of the connection, with `--log-remote-address` only. Behind a proxy, it is the address of the proxy.
 
 ## Log Remote Addresses
 
 SWS adds the client's _Remote Address (IP)_ to each request log.
 
-This feature is disabled by default. Enable it with the boolean `--log-remote-address` option or the equivalent [SERVER_LOG_REMOTE_ADDRESS](./../configuration/env#server-log-remote-address) env. When enabled, request logs include a `remote_addr` field.
+This feature is disabled by default. Enable it with the boolean `--log-remote-address` option or the equivalent [SERVER_LOG_REMOTE_ADDRESS](./../configuration/env#server-log-remote-address) env. When enabled, request logs include the `network.peer.address` field, and the `client.address` field unless a proxy header gives the client (see [Client addresses](#client-addresses)).
 
 ```sh
 static-web-server -a "0.0.0.0" -p 8080 -d docker/public/ -g info --log-remote-address=true
@@ -118,29 +163,32 @@ static-web-server -a "0.0.0.0" -p 8080 -d docker/public/ -g info --log-remote-ad
 
 ```json
 {"timestamp":"2026-05-29T23:43:47.071681+02:00","level":"INFO","message":"log requests with remote IP addresses","enabled":true,"target":"static_web_server::log_addr"}
-{"timestamp":"2026-05-29T23:43:47.151533+02:00","level":"INFO","message":"response","method":"GET","uri":"/","status":200,"remote_addr":"192.168.1.126","target":"static_web_server::log_addr"}
+{"timestamp":"2026-05-29T23:43:47.151533+02:00","level":"INFO","message":"response","http.request.method":"GET","url.path":"/","http.response.status_code":200,"http.response.body.size":1250,"duration":0.000412,"user_agent.original":"curl/8.7.1","client.address":"192.168.1.126","network.peer.address":"192.168.1.126","target":"static_web_server::log_addr"}
 ```
 
 ## Logging Client IP from X-Real-IP header
 
 Some upstream proxies report the client's real IP address in the `X-Real-IP` header.
 
-Enable logging of the `X-Real-IP` header with the `--log-x-real-ip` option or the equivalent [SERVER_LOG_X_REAL_IP](../configuration/env#server-log-x-real-ip) env. When enabled, request logs include an `x_real_ip` field.
+Enable logging of the `X-Real-IP` header with the `--log-x-real-ip` option or the equivalent [SERVER_LOG_X_REAL_IP](../configuration/env#server-log-x-real-ip) env. When enabled, requests from a [trusted proxy](#trusted-proxies) log the header as the `client.address` field, unless `--log-forwarded-for` gives one.
 
 ```json
 {
   "timestamp": "2026-05-29T23:43:47.151533+02:00",
   "level": "INFO",
   "message": "response",
-  "method": "GET",
-  "uri": "/",
-  "status": 200,
-  "x_real_ip": "203.0.113.195",
+  "http.request.method": "GET",
+  "url.path": "/",
+  "http.response.status_code": 200,
+  "http.response.body.size": 1250,
+  "duration": 0.000412,
+  "user_agent.original": "curl/8.7.1",
+  "client.address": "203.0.113.195",
   "target": "static_web_server::log_addr"
 }
 ```
 
-If the value of the `X-Real-IP` header does not parse as an IP address, the `x_real_ip` field is omitted.
+If the value of the `X-Real-IP` header does not parse as an IP address, it is not logged.
 
 The header is logged only for requests from a [trusted proxy](#trusted-proxies).
 
@@ -152,14 +200,14 @@ The list is empty by default, which trusts no one: the headers are never logged 
 
 ## Logging Client IP from X-Forwarded-For header
 
-When SWS runs behind a reverse proxy, the `remote_addr` field reports the proxy's IP address, not the client's. The proxy can be configured to send the [X-Forwarded-For header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For), a comma-separated list of IP addresses that starts with the _real remote client IP_ followed by intermediate proxies.
+When SWS runs behind a reverse proxy, the remote address of the connection is the proxy's IP address, not the client's. The proxy can be configured to send the [X-Forwarded-For header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For), a comma-separated list of IP addresses that starts with the _real remote client IP_ followed by intermediate proxies.
 
-Enable logging of the real remote IP with the `--log-forwarded-for` option or the equivalent [SERVER_LOG_FORWARDED_FOR](../configuration/env#server-log-forwarded-for) env. Requests from a [trusted proxy](#trusted-proxies) with a correctly formatted `X-Forwarded-For` header then get a `real_remote_ip` field with its first address.
+Enable logging of the real remote IP with the `--log-forwarded-for` option or the equivalent [SERVER_LOG_FORWARDED_FOR](../configuration/env#server-log-forwarded-for) env. Requests from a [trusted proxy](#trusted-proxies) with a correctly formatted `X-Forwarded-For` header then log the client address as the `client.address` field, ahead of `X-Real-IP` and the remote address.
 
 Command used for the following examples:
 
 ```sh
-static-web-server -a "::" --log-forwarded-for=true --trusted-proxies="::1" -p 8080 -d docker/public/ -g info
+static-web-server -a "::" --log-forwarded-for=true --trusted-proxies="::1,2001:db8:85a3:8d3:1319:8a2e:370:7348" -p 8080 -d docker/public/ -g info
 ```
 
 Look for these lines in the log output:
@@ -167,26 +215,29 @@ Look for these lines in the log output:
 ```json
 {"timestamp":"2026-05-29T23:43:47.071681+02:00","level":"INFO","message":"log level","log_level":"info","target":"static_web_server::server"}
 {"timestamp":"2026-05-29T23:43:47.071700+02:00","level":"INFO","message":"log X-Forwarded-For header","enabled":true,"target":"static_web_server::log_addr"}
-{"timestamp":"2026-05-29T23:43:47.071710+02:00","level":"INFO","message":"trusted IPs for X-Real-IP and X-Forwarded-For","trusted_proxies":"[::1]","target":"static_web_server::log_addr"}
+{"timestamp":"2026-05-29T23:43:47.071710+02:00","level":"INFO","message":"trusted IPs for X-Real-IP and X-Forwarded-For","trusted_proxies":"[::1, 2001:db8:85a3:8d3:1319:8a2e:370:7348]","target":"static_web_server::log_addr"}
 ```
 
-Simulate a request from behind a reverse proxy with an additional intermediate proxy:
+Simulate a request from behind a reverse proxy with an additional intermediate proxy, `2001:db8:85a3:8d3:1319:8a2e:370:7348`, which is also listed in `--trusted-proxies`:
 
 ```sh
 curl "http://[::1]:8080" --header "X-Forwarded-For: 203.0.113.195, 2001:db8:85a3:8d3:1319:8a2e:370:7348"
 ```
 
-The request log includes the `real_remote_ip` field:
+The request log includes the `client.address` field:
 
 ```json
 {
   "timestamp": "2026-05-29T23:43:47.151533+02:00",
   "level": "INFO",
   "message": "response",
-  "method": "GET",
-  "uri": "/",
-  "status": 200,
-  "real_remote_ip": "203.0.113.195",
+  "http.request.method": "GET",
+  "url.path": "/",
+  "http.response.status_code": 200,
+  "http.response.body.size": 1250,
+  "duration": 0.000412,
+  "user_agent.original": "curl/8.7.1",
+  "client.address": "203.0.113.195",
   "target": "static_web_server::log_addr"
 }
 ```
@@ -199,25 +250,28 @@ If the request comes from `127.0.0.1` instead:
 curl "http://127.0.0.1:8080" --header "X-Forwarded-For: 203.0.113.195, 2001:db8:85a3:8d3:1319:8a2e:370:7348"
 ```
 
-the log omits `real_remote_ip`:
+the log omits `client.address`:
 
 ```json
 {
   "timestamp": "2026-05-29T23:43:47.151533+02:00",
   "level": "INFO",
   "message": "response",
-  "method": "GET",
-  "uri": "/",
-  "status": 200,
+  "http.request.method": "GET",
+  "url.path": "/",
+  "http.response.status_code": 200,
+  "http.response.body.size": 1250,
+  "duration": 0.000412,
+  "user_agent.original": "curl/8.7.1",
   "target": "static_web_server::log_addr"
 }
 ```
 
-`127.0.0.1` is not in `trusted_proxies`, so no `real_remote_ip` field is added. To log both the proxy address and the real remote address, set both `--log-remote-address` and `--log-forwarded-for`.
+`127.0.0.1` is not in `trusted_proxies`, so the header is not logged. With `--log-remote-address` as well, `client.address` would be `127.0.0.1`, the remote address. To log both the proxy address and the real remote address, set both `--log-remote-address` and `--log-forwarded-for`: the proxy is then logged as `network.peer.address`.
 
 ---
 
-SWS parses the `X-Forwarded-For` header and ignores an invalid client IP to prevent log poisoning attacks. In that case the `real_remote_ip` field is omitted.
+SWS parses the `X-Forwarded-For` header and ignores an invalid client IP to prevent log poisoning attacks. In that case the header is not logged.
 
 Example from above, but with an invalid header:
 
@@ -230,9 +284,12 @@ curl "http://[::1]:8080" --header "X-Forwarded-For: <iframe src=//malware.attack
   "timestamp": "2026-05-29T23:43:47.151533+02:00",
   "level": "INFO",
   "message": "response",
-  "method": "GET",
-  "uri": "/",
-  "status": 200,
+  "http.request.method": "GET",
+  "url.path": "/",
+  "http.response.status_code": 200,
+  "http.response.body.size": 1250,
+  "duration": 0.000412,
+  "user_agent.original": "curl/8.7.1",
   "target": "static_web_server::log_addr"
 }
 ```
@@ -265,9 +322,9 @@ A token is written as `%{name}`. `%%` writes a literal `%`. Any other text is co
 | `%{status}`        | Response status code                                                                                                                                                                                    |
 | `%{bytes}`         | Number of response body bytes sent, after on-the-fly compression, without the headers. `-` when no body bytes were sent, always for `HEAD`, `204` and `304` (like `%b` in the Common Log Format)        |
 | `%{duration}`      | Time from the start of request handling until the response body is finished, in seconds with microsecond precision                                                                                      |
-| `%{remote_addr}`   | Client IP address                                                                                                                                                                                       |
+| `%{remote_addr}`   | Remote IP address of the connection                                                                                                                                                                     |
 | `%{x_real_ip}`     | `X-Real-IP` address, see [Logging Client IP from X-Real-IP header](#logging-client-ip-from-x-real-ip-header)                                                                                            |
-| `%{forwarded_for}` | First `X-Forwarded-For` address, see [Logging Client IP from X-Forwarded-For header](#logging-client-ip-from-x-forwarded-for-header)                                                                    |
+| `%{forwarded_for}` | Client address from `X-Forwarded-For`, the rightmost entry not in trusted proxies, see [Logging Client IP from X-Forwarded-For header](#logging-client-ip-from-x-forwarded-for-header)                  |
 | `%{host}`          | Host as sent by the client, before [URL Rewrites](./url-rewrites): the request URI authority (HTTP/2 `:authority` or an absolute-form request target) without user info, else the `Host` header         |
 | `%{user_agent}`    | `User-Agent` header                                                                                                                                                                                     |
 | `%{referer}`       | `Referer` header                                                                                                                                                                                        |
@@ -318,8 +375,8 @@ curl "http://localhost:8787/missing.css" \
 ```
 
 ```json
-{"timestamp":"2026-09-28T10:39:57.103712+02:00","level":"WARN","method":"GET","uri":"/missing.css","status":404,"error":"Not Found","target":"static_web_server::error_page","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
-{"timestamp":"2026-09-28T10:39:57.103890+02:00","level":"INFO","message":"response","method":"GET","uri":"/missing.css","status":404,"target":"static_web_server::log_addr","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
+{"timestamp":"2026-09-28T10:39:57.103712+02:00","level":"WARN","http.request.method":"GET","url.path":"/missing.css","http.response.status_code":404,"error":"Not Found","target":"static_web_server::error_page","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
+{"timestamp":"2026-09-28T10:39:57.103890+02:00","level":"INFO","message":"response","http.request.method":"GET","url.path":"/missing.css","http.response.status_code":404,"http.response.body.size":153,"duration":0.000412,"user_agent.original":"curl/8.7.1","target":"static_web_server::log_addr","span_id":"00f067aa0ba902b7","trace_flags":"01","trace_id":"4bf92f3577b34da6a3ce929d0e0e4736"}
 ```
 
 SWS only reads the header. It does not generate trace IDs, export spans or change the headers of the request or the response. Missing, invalid or repeated `traceparent` headers are ignored; see the specification's [versioning rules](https://www.w3.org/TR/trace-context/#versioning-of-traceparent).
